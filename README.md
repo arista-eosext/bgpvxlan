@@ -1,10 +1,13 @@
 bgpvxlan
 ========
-
-Use BGP Community Attribute to advertise VTEP Loopback addresses
-Using BGP Community Attribute to Advertise VTEPs 
+Use BGP Community Attribute to advertise VTEP Loopback addresses using BGP Community Attribute to Advertise VTEPs 
 for VXLAN with Head End Replication
 
+##Author
+Jeremy Georges - Arista Networks 
+jgeorges@arista.com
+
+##Description
 
 The purpose of this document and script is to outline the possibility of using BGP’s Community Attribute to mark a loopback address/prefix as a VTEP in a VXLAN network. 
 
@@ -24,6 +27,7 @@ After testing with vEOS with the above topology, this works very well, with a wo
 
 Here is an example of when one of the Leaf switches (leaf3) is down. You can see that we only have one BGP route with the Community of 5555:5555, which was used for this proof of concept. Therefore, the script only added this remote loopback address to the ‘Vxlan flood vtep’ list.
 
+```
 vxlan-leaf1(config)#show ip bgp community 5555:5555
 BGP routing table information for VRF default
 Router identifier 192.168.254.3, local AS number 65001
@@ -44,15 +48,17 @@ interface Vxlan1
    vxlan vlan 100 vni 10000
    vxlan vlan 200 vni 20000
    vxlan flood vtep 192.168.254.4
-
+```
 
 After bringing up Leaf-switch 3, it begins to advertise its loopback address and the arbitrary BGP Community 5555:5555. Notice the syslog entry from the script which parses the BGP routes and sees the new /32 route with the correct community now advertised.
-
+```
 Jul 18 04:27:40 vxlan-leaf1 BGPVXLAN-AGENT[1740]: Log processing initiated...
 Jul 18 04:27:41 vxlan-leaf1 BGPVXLAN-AGENT[1740]: Parsing bgp routes for community 5555:5555 
 Jul 18 04:27:42 vxlan-leaf1 BGPVXLAN-AGENT[1740]: Looking up currently configured vtep flood list
 Jul 18 04:27:42 vxlan-leaf1 BGPVXLAN-AGENT[1740]: VTEP 192.168.254.5 being added to our flood list
+```
 
+```
 vxlan-leaf1(config)#show ip bgp community 5555:5555
 BGP routing table information for VRF default
 Router identifier 192.168.254.3, local AS number 65001
@@ -66,13 +72,13 @@ AS Path Attributes: Or-ID - Originator ID, C-LST - Cluster List, LL Nexthop - Li
  *  e 192.168.254.4/32    10.1.1.9         0       100     0      65535 65002 i  
  * >E 192.168.254.5/32    10.1.1.1         0       100     0      65535 65003 i  
  *  e 192.168.254.5/32    10.1.1.9         0       100     0      65535 65003 i  
-
+```
 
 
 
 
 The script automatically adds the remote vtep address in the flood list.
-
+```
 vxlan-leaf1(config)#show run section interface Vxlan1
 interface Vxlan1
    vxlan source-interface Loopback0
@@ -80,7 +86,7 @@ interface Vxlan1
    vxlan vlan 100 vni 10000
    vxlan vlan 200 vni 20000
    vxlan flood vtep 192.168.254.4 192.168.254.5
-
+```
 
 This provides a feasible mechanism to advertise VTEP loopback address throughout a datacenter by leveraging BGP.
 
@@ -88,7 +94,7 @@ This provides a feasible mechanism to advertise VTEP loopback address throughout
 The general configuration for the route-map and BGP is not difficult and can be augmented to any existing ECMP design.
 
 Config snippet below:
-
+```
 interface Loopback0
    ip address 192.168.254.3/32
 !
@@ -123,8 +129,11 @@ router bgp 65001
    neighbor 10.1.1.9 route-map MYVTEP out
    neighbor 10.1.1.9 maximum-routes 12000 
    network 192.168.254.3/32
+```
 
 
+For more details on VXLAN configuration in EOS, please refer to the Arista EOS documentation found at:
+http://www.arista.com/en/support/docs
 
 
 
