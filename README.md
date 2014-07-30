@@ -136,4 +136,7 @@ For more details on VXLAN configuration in EOS, please refer to the Arista EOS d
 http://www.arista.com/en/support/docs
 
 
+License
+=======
+BSD-3, See LICENSE file
 
