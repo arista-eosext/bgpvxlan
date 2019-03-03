@@ -3,11 +3,11 @@ bgpvxlan
 Use BGP Community Attribute to advertise VTEP Loopback addresses using BGP Community Attribute to Advertise VTEPs 
 for VXLAN with Head End Replication
 
-##Author
+## Author
 Jeremy Georges - Arista Networks 
 jgeorges@arista.com
 
-##Description
+## Description
 
 The purpose of this document and script is to outline the possibility of using BGP’s Community Attribute to mark a loopback address/prefix as a VTEP in a VXLAN network. 
 
